@@ -1,6 +1,9 @@
-FROM rockylinux:9
+ARG NAME
+ARG VERSION
 
-ENV NAME=rocky-toolbox VERSION=9
+FROM rockylinux:$VERSION
+
+ENV NAME=$NAME VERSION=$VERSION
 
 LABEL com.github.containers.toolbox="true" \
       name="$NAME" \
