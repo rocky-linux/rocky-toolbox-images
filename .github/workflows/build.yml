@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Setup Quay login
-        run: echo "${{ secrets.QUAY_TOKEN }}" | docker login quay.io -u ${{ secrets.QUAY_USERNAME }} --password-stdin
+        run: echo "${{ secrets.QUAY_TOKEN }}" | podman login quay.io -u=${{ secrets.QUAY_USERNAME }} --password-stdin
       
       - name: Build image
         run: podman build . --file Dockerfile --tag quay.io/lumarel/rocky-toolbox:9
