@@ -1,0 +1,25 @@
+---
+name: Build toolbox images
+
+on:
+  push:
+    branches: [ $default-branch ]
+  workflow_dispatch:
+  schedule:
+    - cron: "30 0 * * 0"
+
+jobs:
+  run_toolbox_builds:
+    runs-on: ubuntu-22.04
+    name: Build and push toolbox images
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Quay login
+        run: echo "${{ secrets.QUAY_TOKEN }}" | podman login quay.io -u=${{ secrets.QUAY_USERNAME }} --password-stdin
+      
+      - name: Build image
+        run: podman build . --file Dockerfile --tag quay.io/lumarel/rocky-toolbox:9
+
+      - name: Push image
+        run: podman push quay.io/lumarel/rocky-toolbox:9
