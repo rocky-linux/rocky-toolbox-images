@@ -1,4 +1,4 @@
-FROM docker.io/_/rockylinux:9
+FROM rockylinux:9
 
 ENV NAME=rocky-toolbox VERSION=9
 
