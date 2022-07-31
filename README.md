@@ -67,7 +67,7 @@ Finally you can remove the toolbox:
 
 By default, Toolbox creates the container using an [OCI](https://www.opencontainers.org) image called `<ID>-toolbox:<VERSION-ID>`, where `<ID>` and `<VERSION-ID>` are taken from the host's /usr/lib/os-release. For example, the default image on a Rocky Linux 9 host would be rocky-toolbox:9.
 
-This default can be overridden by the `--image` option in toolbox create, but operating system distributors should provide an adequately configured default image to ensure a smooth user experience.
+This default can be overridden by the `--image` option in `toolbox create`, but operating system distributors should provide an adequately configured default image to ensure a smooth user experience.
 
 ## Image requirements
 
