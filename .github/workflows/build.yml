@@ -1,0 +1,30 @@
+---
+name: Build toolbox images
+
+on:
+  push:
+    branches: [ $default-branch ]
+  workflow_dispatch:
+  schedule:
+    - cron: "30 0 * * 0"
+
+jobs:
+  run_toolbox_builds:
+    strategy:
+      matrix:
+        version:
+          - 8
+          - 9
+    runs-on: ubuntu-22.04
+    name: Build and push toolbox images
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Registry login
+        run: echo "${{ secrets.REGISTRY_TOKEN }}" | podman login docker.io -u=${{ secrets.REGISTRY_USERNAME }} --password-stdin
+      
+      - name: Build image
+        run: podman build . --file Dockerfile --tag docker.io/rockylinux/rocky-toolbox:${{ matrix.version }} --build-arg ImageVersion=${{ matrix.version }} --label name=rocky-toolbox --label version=${{ matrix.version }} --squash-all
+
+      - name: Push image
+        run: podman push docker.io/rockylinux/rocky-toolbox:${{ matrix.version }}
