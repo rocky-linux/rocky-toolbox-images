@@ -1,0 +1,44 @@
+---
+name: Build CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  IMAGE_REGISTRY: docker.io
+  IMAGE_ACCOUNT: rockylinux
+
+jobs:
+  run_toolbox_builds:
+    strategy:
+      matrix:
+        version:
+          - 8
+          - 9
+    runs-on: ubuntu-latest
+    name: Build and push toolbox images
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install qemu dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static
+      
+      - name: Build image
+        uses: redhat-actions/buildah-build@v2
+        id: build-image
+        with:
+          archs: amd64, arm64
+          build-args: |
+            ImageVersion=${{ matrix.version }}
+          containerfiles: |
+            ./Dockerfile
+          extra-args: |
+            --squash
+          labels: |
+            name=rocky-toolbox
+            version=${{ matrix.version }}
+          tags: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_ACCOUNT }}/rocky-toolbox:${{ matrix.version }}
