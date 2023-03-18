@@ -1,12 +1,10 @@
 ---
-name: Build toolbox images
+name: Build CI
 
 on:
-  push:
+  pull_request:
     branches: [ main ]
   workflow_dispatch:
-  schedule:
-    - cron: "30 0 * * 0"
 
 env:
   IMAGE_REGISTRY: docker.io
@@ -28,13 +26,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y qemu-user-static
-
-      - name: Setup Registry login
-        uses: redhat-actions/podman-login@v1
-        with:
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_TOKEN }}
-          registry: ${{ env.IMAGE_REGISTRY }}
       
       - name: Build image
         uses: redhat-actions/buildah-build@v2
@@ -51,9 +42,3 @@ jobs:
             name=rocky-toolbox
             version=${{ matrix.version }}
           tags: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_ACCOUNT }}/rocky-toolbox:${{ matrix.version }}
-
-      - name: Push image
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
