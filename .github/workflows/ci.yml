@@ -41,4 +41,5 @@ jobs:
           labels: |
             name=rocky-toolbox
             version=${{ matrix.version }}
+          oci: true
           tags: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_ACCOUNT }}/rocky-toolbox:${{ matrix.version }}
