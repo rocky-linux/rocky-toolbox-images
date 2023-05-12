@@ -17,8 +17,10 @@ jobs:
     strategy:
       matrix:
         version:
-          - 8
-          - 9
+          - major: 8
+            arch: 'amd64, arm64'
+          - major: 9
+            arch: 'amd64, arm64, ppc64le, s390x'
     runs-on: ubuntu-latest
     name: Build and push toolbox images
     steps:
@@ -40,18 +42,18 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         id: build-image
         with:
-          archs: amd64, arm64
+          archs: ${{ matrix.version.arch }}
           build-args: |
-            ImageVersion=${{ matrix.version }}
+            ImageVersion=${{ matrix.version.major }}
           containerfiles: |
             ./Dockerfile
           extra-args: |
             --squash
           labels: |
             name=rocky-toolbox
-            version=${{ matrix.version }}
+            version=${{ matrix.version.major }}
           oci: true
-          tags: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_ACCOUNT }}/rocky-toolbox:${{ matrix.version }}
+          tags: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_ACCOUNT }}/rocky-toolbox:${{ matrix.version.major }}
 
       - name: Push image
         uses: redhat-actions/push-to-registry@v2
