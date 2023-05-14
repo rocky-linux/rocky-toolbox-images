@@ -8,10 +8,6 @@ on:
   schedule:
     - cron: "30 0 * * 0"
 
-env:
-  IMAGE_REGISTRY: docker.io
-  IMAGE_ACCOUNT: rockylinux
-
 jobs:
   run_toolbox_builds:
     strategy:
@@ -21,6 +17,13 @@ jobs:
             arch: 'amd64, arm64'
           - major: 9
             arch: 'amd64, arm64, ppc64le, s390x'
+        registry:
+          - domain: docker.io
+            account: rockylinux
+            secret: DOCKER
+          - domain: quay.io
+            account: rockylinux
+            secret: QUAY
     runs-on: ubuntu-latest
     name: Build and push toolbox images
     steps:
@@ -34,10 +37,10 @@ jobs:
       - name: Setup Registry login
         uses: redhat-actions/podman-login@v1
         with:
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_TOKEN }}
-          registry: ${{ env.IMAGE_REGISTRY }}
-      
+          username: ${{ secrets[format('{0}_USERNAME', matrix.registry.secret)] }}
+          password: ${{ secrets[format('{0}_TOKEN', matrix.registry.secret)] }}
+          registry: ${{ matrix.registry.domain }}
+
       - name: Build image
         uses: redhat-actions/buildah-build@v2
         id: build-image
@@ -53,7 +56,7 @@ jobs:
             name=rocky-toolbox
             version=${{ matrix.version.major }}
           oci: true
-          tags: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_ACCOUNT }}/rocky-toolbox:${{ matrix.version.major }}
+          tags: ${{ matrix.registry.domain }}/${{ matrix.registry.account }}/rocky-toolbox:${{ matrix.version.major }}
 
       - name: Push image
         uses: redhat-actions/push-to-registry@v2
