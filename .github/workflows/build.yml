@@ -54,7 +54,8 @@ jobs:
             --squash
           labels: |
             name=rocky-toolbox
-            version=${{ matrix.version.major }}
+            org.opencontainers.image.title=rocky-toolbox
+            org.opencontainers.image.version=${{ matrix.version.major }}
           oci: true
           tags: ${{ matrix.registry.domain }}/${{ matrix.registry.account }}/rocky-toolbox:${{ matrix.version.major }}
 
