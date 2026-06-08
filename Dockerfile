@@ -2,6 +2,8 @@ ARG ImageVersion
 
 FROM rockylinux/rockylinux:$ImageVersion
 
+ARG ImageVersion
+
 LABEL com.github.containers.toolbox="true" \
       usage="This image is meant to be used with the toolbox command" \
       org.opencontainers.image.authors="Magauer Lukas <lukas@magauer.eu>" \
@@ -19,9 +21,12 @@ COPY missing-docs /
 RUN dnf -y reinstall $(<missing-docs)
 RUN rm /missing-docs
 
-COPY extra-packages /
-RUN dnf -y install $(<extra-packages)
-RUN rm /extra-packages
+COPY extra-packages* /tmp/
+RUN dnf -y install $(</tmp/extra-packages-common)
+RUN if [ -f /tmp/extra-packages-${ImageVersion} ]; then \
+      dnf -y install $(</tmp/extra-packages-${ImageVersion}); \
+    fi
+RUN rm -f /tmp/extra-packages*
 
 RUN dnf clean all
 

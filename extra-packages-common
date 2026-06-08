@@ -19,7 +19,6 @@ less
 lsof
 man-db
 man-pages
-mlocate
 mtr
 openssh-clients
 passwd
