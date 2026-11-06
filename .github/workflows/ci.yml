@@ -25,22 +25,15 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and push toolbox images
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
 
-      - name: Install qemu dependency
+      - name: Install QEMU support
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-user-static
-
-      - name: Setup Registry login
-        uses: redhat-actions/podman-login@v1
-        with:
-          username: ${{ secrets[format('{0}_USERNAME', matrix.registry.secret)] }}
-          password: ${{ secrets[format('{0}_TOKEN', matrix.registry.secret)] }}
-          registry: ${{ matrix.registry.domain }}
+          sudo apt-get install -y qemu-user-binfmt
 
       - name: Build image
-        uses: redhat-actions/buildah-build@v2
+        uses: redhat-actions/buildah-build@v3
         id: build-image
         with:
           archs: ${{ matrix.version.arch }}
@@ -48,8 +41,6 @@ jobs:
             ImageVersion=${{ matrix.version.major }}
           containerfiles: |
             ./Dockerfile
-          extra-args: |
-            --squash
           labels: |
             name=rocky-toolbox
             org.opencontainers.image.title=rocky-toolbox
